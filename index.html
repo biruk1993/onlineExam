@@ -1,0 +1,1425 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam</title>
+    <style>
+        /* CSS Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #welcome-container, #quiz-container, #result-container {
+            display: none;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        #timer {
+            color: #e63946;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        #options label {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            cursor: pointer;
+            justify-content: flex-start;
+            text-align: left;
+            padding-left: 20px;
+            font-size: 1.1em;
+        }
+
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        #submit-btn {
+            background: #28a745;
+        }
+
+        #submit-btn:hover {
+            background: #218838;
+        }
+
+        /* Fixing alignment */
+        #question-container {
+            text-align: left;
+        }
+
+        #question-text {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            padding-left: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Page -->
+    <div id="welcome-container">
+        <h1>Welcome to the Online Exam Model</h1>
+        <p>This exam is prepared by the Ethiopian Military Academy.</p>
+        <p>This model has 100 questions. You can only choose one answer per question.</p>
+        <p>After finishing your answers, please click the Submit button!</p>
+        <input type="text" id="student-name" placeholder="Enter your full name" required>
+        <button onclick="startQuiz()">Click here to continue to the questions</button>
+    </div>
+
+    <!-- Quiz Page -->
+    <div id="quiz-container">
+        <h1>Exam</h1>
+        <div id="timer">Time left: 60s</div>
+        <div id="question-container">
+            <p id="question-text"></p>
+            <div id="options"></div>
+        </div>
+        <div class="buttons">
+            <button id="prev-btn" onclick="prevQuestion()" style="display: none;">Previous</button>
+            <button id="next-btn" onclick="nextQuestion()">Next</button>
+            <button id="submit-btn" onclick="showResults()" style="display: none;">Submit</button>
+        </div>
+    </div>
+
+    <!-- Results Page -->
+    <div id="result-container">
+        <h1>Exam Completed</h1>
+        <h2 id="final-message"></h2>
+        <p>Your result is <span id="final-score"></span> out of <span id="total-questions"></span>.</p>
+    </div>
+
+    <script>
+        const questions = [
+    {
+        question: "1.The main purpose of a flanking maneuver is to:",
+        options: [
+            "A) Attack from the front",
+            "B) Attack from the side",
+            "C) Attack from the rear",
+            "D) Confuse the enemy"
+        ],
+        answer: 1,
+        selected: null
+        
+    },
+    {
+        question: "2.In an ambush, the best position to wait for the enemy is:",
+        options: [
+            "A) In an open field",
+            "B) In a concealed location with good sight lines",
+            "C) Directly in front of the enemy",
+            "D) At the highest ground"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "3.What is the primary purpose of reconnaissance in military tactics?",
+        options: [
+            "A) Destroy the enemy",
+            "B) Gather intelligence about enemy positions",
+            "C) Secure supply routes",
+            "D) Deliver surprise attacks"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "4.What is the best strategy for a platoon to break through an enemy's defensive line?",
+        options: [
+            "A) Charge directly at the position",
+            "B) Flank the enemy from multiple directions",
+            "C) Use air strikes before advancing",
+            "D) Wait for reinforcements"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "5.The main objective of a combat support unit is to:",
+        options: [
+            "A) Engage in direct combat",
+            "B) Provide logistical and medical support",
+            "C) Secure the battlefield",
+            "D) Manage tactical communications"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "6.Which of the following is part of HR's role in an organization?",
+        options: [
+            "A) Financial auditing",
+            "B) Employee recruitment and training",
+            "C) Product marketing",
+            "D) Inventory management"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "7.The most effective way to retain employees is through:",
+        options: [
+            "A) Strict performance monitoring",
+            "B) Offering competitive benefits and career growth opportunities",
+            "C) Regular salary deductions",
+            "D) Limiting paid leave"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "8.A SWOT analysis focuses on:",
+        options: [
+            "A) Sales, Workforce, Operations, Technology",
+            "B) Strengths, Weaknesses, Opportunities, Threats",
+            "C) Strategies, Workflows, Objectives, Teams",
+            "D) Services, Wealth, Optimization, Training"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "9.The primary goal of organizational planning is to:",
+        options: [
+            "A) Develop business strategies",
+            "B) Ensure financial success",
+            "C) Optimize resource use",
+            "D) Comply with legal requirements"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        question: "10.What is the primary goal of personal leadership development?",
+        options: [
+            "A) To gain power and control",
+            "B) To improve personal effectiveness and influence",
+            "C) To enforce discipline",
+            "D) To inspire fear in others"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "11.Which of the following is most important for a leader during a military operation?",
+        options: [
+            "A) Strict adherence to protocol",
+            "B) Ability to adapt and improvise",
+            "C) Keeping information to themselves",
+            "D) Refraining from any communication"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "12.Which of the following is NOT typically a part of military drill?",
+        options: [
+            "A) Marching in formation",
+            "B) Performing tactical movements",
+            "C) Having discussions on military strategy",
+            "D) Practicing uniform standards"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        question: "13.Military drills can help soldiers in combat by:",
+        options: [
+            "A) Providing tactical knowledge only",
+            "B) Improving teamwork and response times under pressure",
+            "C) Making soldiers more independent in battle",
+            "D) Giving soldiers a chance to avoid training"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "14.Combat support operations are typically coordinated by:",
+        options: [
+            "A) Infantry commanders",
+            "B) Medical officers",
+            "C) Combat support branch leaders",
+            "D) Political officers"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        question: "15.Effective military communication is crucial for:",
+        options: [
+            "A) Improving the morale of troops",
+            "B) Ensuring the clear transmission of orders and updates",
+            "C) Limiting the number of soldiers involved in operations",
+            "D) Decreasing the need for equipment"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "16.What is the biggest challenge in military communication?",
+        options: [
+            "A) Understanding technical language",
+            "B) Ensuring timely and accurate message delivery",
+            "C) Using complex code systems",
+            "D) Avoiding overuse of communication devices"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "17.Military doctrine defines:",
+        options: [
+            "A) Strategies for defeating the enemy",
+            "B) Policies for soldier discipline",
+            "C) The fundamental principles guiding military operations",
+            "D) Command structures for each branch"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        question: "18.The primary purpose of military doctrine is to:",
+        options: [
+            "A) Define the rules of engagement in combat",
+            "B) Regulate daily activities of soldiers",
+            "C) Establish a set of broad guidelines for military strategy and operations",
+            "D) Determine the allocation of resources"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        question: "19.Which is the most essential element in developing effective military doctrine?",
+        options: [
+            "A) Innovation in tactics",
+            "B) Consistency in messaging",
+            "C) Knowledge of history and past conflicts",
+            "D) Strict rule enforcement"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        question: "20.The Socratic method in teaching emphasizes:",
+        options: [
+            "A) Passive listening",
+            "B) Questioning and dialogue to stimulate critical thinking",
+            "C) Memorizing specific facts",
+            "D) Using multimedia presentations for engagement"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "21.The primary goal of instructional methods in military training is to:",
+        options: [
+            "A) Teach cadets how to pass exams",
+            "B) Prepare cadets to apply learned knowledge in practical situations",
+            "C) Fill cadets' time with exercises",
+            "D) Focus on administrative tasks"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "22.The military fitness test usually includes assessments of:",
+        options: [
+            "A) Intelligence and strategic thinking",
+            "B) Physical endurance and strength",
+            "C) Academic knowledge",
+            "D) Communication skills"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "23.What is a key component of physical fitness training for soldiers?",
+        options: [
+            "A) Doing exercises until failure",
+            "B) Regular cardiovascular, strength, and flexibility training",
+            "C) Focusing only on upper body strength",
+            "D) Avoiding any rest periods"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "24.The ability to use topographical features to gain an advantage in combat is known as:",
+        options: [
+            "A) Battlefield strategy",
+            "B) Terrain analysis",
+            "C) Topographical warfare",
+            "D) Ground manipulation"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        question: "25.Which topographical feature is most advantageous for defense?",
+        options: [
+            "A) Open plains",
+            "B) High ground with good visibility",
+            "C) Desert areas with little vegetation",
+            "D) Urban environments"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 26,
+        question: "26.Understanding military topography helps in:",
+        options: [
+            "A) Setting up military bases in the safest locations",
+            "B) Designing military uniforms",
+            "C) Decreasing communication efforts",
+            "D) Avoiding the use of weapons"
+        ],
+        answer: 0,
+        selected: null
+    },
+    {
+        number: 27,
+        question: "27.A qualitative research method is typically used to:",
+        options: [
+            "A) Quantify data",
+            "B) Gather numerical data",
+            "C) Explore concepts, experiences, and behaviors",
+            "D) Ensure data reliability"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 28,
+        question: "28.Which research methodology focuses on observing phenomena as they naturally occur?",
+        options: [
+            "A) Experimental research",
+            "B) Case study research",
+            "C) Observational research",
+            "D) Quantitative research"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 29,
+        question: "29.Which conflict resolution strategy involves both parties finding a middle ground?",
+        options: [
+            "A) Avoidance",
+            "B) Collaboration",
+            "C) Competition",
+            "D) Accommodation"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 30,
+        question: "30.A key element of conflict management in the military is:",
+        options: [
+            "A) Ignoring the issue",
+            "B) Clear communication and mutual respect",
+            "C) Confronting the issue aggressively",
+            "D) Using force to resolve disagreements"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 31,
+        question: "31.Which of the following is a key benefit of practicing military drills?",
+        options: [
+            "A) Learning how to read maps",
+            "B) Mastering the art of close combat",
+            "C) Improving discipline and responsiveness",
+            "D) Avoiding participation in combat"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 32,
+        question: "32.The primary purpose of parade drills is to:",
+        options: [
+            "A) Show off soldiers' uniforms",
+            "B) Build individual discipline and teamwork",
+            "C) Increase morale through ceremonial display",
+            "D) Test soldiers’ endurance"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 33,
+        question: "33.Which behavior is expected of a professional soldier?",
+        options: [
+            "A) Disrespect towards the chain of command",
+            "B) Seeking personal gain through military service",
+            "C) Consistent adherence to duties and ethical standards",
+            "D) Avoiding responsibility when possible"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 34,
+        question: "34.Military professionalism includes maintaining:",
+        options: [
+            "A) A relaxed work environment",
+            "B) Strict adherence to personal schedules",
+            "C) High standards of conduct, performance, and appearance",
+            "D) Informal communication with subordinates"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 35,
+        question: "35.What formation is best used when conducting a rapid assault with a squad?",
+        options: [
+            "A) Line",
+            "B) Wedge",
+            "C) Column",
+            "D) Diamond"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 36,
+        question: "36.The role of a reserve force in a combat operation is to:",
+        options: [
+            "A) Lead the assault",
+            "B) Provide logistical support",
+            "C) Reinforce weakened units",
+            "D) Protect the perimeter"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 37,
+        question: "37.In a defensive operation, the objective is to:",
+        options: [
+            "A) Destroy the enemy's forces completely",
+            "B) Hold a key position or area",
+            "C) Take the enemy's capital",
+            "D) Surprise the enemy"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 38,
+        question: "38.Which HR function is focused on ensuring employees meet the organization’s standards?",
+        options: [
+            "A) Compensation",
+            "B) Training and Development",
+            "C) Performance Management",
+            "D) Employee Welfare"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 39,
+        question: "39.Which method is commonly used to assess job satisfaction?",
+        options: [
+            "A) Employee surveys",
+            "B) Job rotations",
+            "C) Salary reviews",
+            "D) Team-building exercises"
+        ],
+        answer: 0,
+        selected: null
+    },
+    {
+        number: 40,
+        question: "40.The primary purpose of employee motivation programs is to:",
+        options: [
+            "A) Reduce turnover",
+            "B) Increase salaries",
+            "C) Enforce discipline",
+            "D) Comply with labor laws"
+        ],
+        answer: 0,
+        selected: null
+    },
+    {
+        number: 41,
+        question: "41.Which of the following is a key managerial skill?",
+        options: [
+            "A) Technical skill",
+            "B) Interpersonal skill",
+            "C) Conceptual skill",
+            "D) All of the above"
+        ],
+        answer: 3,
+        selected: null
+    },
+    {
+        number: 42,
+        question: "42.The first step in the decision-making process is:",
+        options: [
+            "A) Identifying alternatives",
+            "B) Evaluating options",
+            "C) Recognizing the problem",
+            "D) Implementing the solution"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 43,
+        question: "43.What is the main purpose of a business strategy?",
+        options: [
+            "A) To optimize resources",
+            "B) To increase profit margins",
+            "C) To set long-term goals for the organization",
+            "D) To ensure product quality"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 44,
+        question: "44.What is a key characteristic of ethical leadership?",
+        options: [
+            "A) Decision-making based on personal gain",
+            "B) Transparency and fairness in decision-making",
+            "C) Avoiding accountability",
+            "D) Autocratic control of team behavior"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 45,
+        question: "45.A leader who inspires confidence and loyalty among their troops is demonstrating:",
+        options: [
+            "A) Charisma",
+            "B) Autocratic behavior",
+            "C) Strategic thinking",
+            "D) Tactical flexibility"
+        ],
+        answer: 0,
+        selected: null
+    },
+    {
+        number: 46,
+        question: "46.Which of the following is NOT a core value of military professionalism?",
+        options: [
+            "A) Integrity",
+            "B) Competence",
+            "C) Loyalty",
+            "D) Personal freedom"
+        ],
+        answer: 3,
+        selected: null
+    },
+    {
+        number: 47,
+        question: "47.The military's code of ethics emphasizes:",
+        options: [
+            "A) Strict obedience to superiors",
+            "B) Taking personal initiative without consulting others",
+            "C) Upholding personal values above military directives",
+            "D) Maintaining professionalism in all aspects of military life"
+        ],
+        answer: 3,
+        selected: null
+    },
+    {
+        number: 48,
+        question: "48.What is the primary benefit of physical fitness for soldiers?",
+        options: [
+            "A) Improved appearance",
+            "B) Enhanced mental focus and physical endurance",
+            "C) Higher salaries",
+            "D) Ability to skip regular training"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 49,
+        question: "49.Which of the following exercises best improves cardiovascular endurance?",
+        options: [
+            "A) Weightlifting",
+            "B) Running or cycling",
+            "C) Yoga",
+            "D) Stretching"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 50,
+        question: "50.The primary purpose of physical fitness in the military is to:",
+        options: [
+            "A) Build aesthetic muscle",
+            "B) Prepare soldiers for physically demanding tasks in combat",
+            "C) Ensure soldiers can run marathons",
+            "D) Provide personal entertainment"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 51,
+        question: "51. Which of the following best describes a doctrinal shift?",
+        options: [
+            "A) Changing the physical training routine",
+            "B) Re-evaluating strategies and tactics based on new threats",
+            "C) Introducing new weapons technology",
+            "D) A shift in leadership style"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 52,
+        question: "52. Which teaching method emphasizes active student participation and problem-solving?",
+        options: [
+            "A) Lecture-based instruction",
+            "B) Experiential learning",
+            "C) Instructional demonstrations",
+            "D) Rote memorization"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 53,
+        question: "53. Which unit would typically provide air support during combat?",
+        options: [
+            "A) Infantry",
+            "B) Engineering",
+            "C) Artillery",
+            "D) Aviation"
+        ],
+        answer: 3,
+        selected: null
+    },
+    {
+        number: 54,
+        question: "54. Combat support helps combat units by:",
+        options: [
+            "A) Allowing them to fight independently without external assistance",
+            "B) Ensuring that medical and logistical needs are met",
+            "C) Providing cover during retreat",
+            "D) Offering entertainment during breaks"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 55,
+        question: "55. Which of the following is an example of combat support equipment?",
+        options: [
+            "A) Light machine guns",
+            "B) Armored vehicles",
+            "C) Combat drones",
+            "D) Field kitchens"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 56,
+        question: "56. Which of the following formations is best for a platoon maneuvering in open terrain?",
+        options: [
+            "A) Line",
+            "B) Column",
+            "C) Wedge",
+            "D) Diamond"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 57,
+        question: "57. Which of the following best describes the key principle of maneuver warfare?",
+        options: [
+            "A) High casualty rates",
+            "B) Surprise and speed to disorient the enemy",
+            "C) Use of heavy artillery",
+            "D) Engaging in prolonged combat"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 58,
+        question: "58. A key disadvantage of using a column formation during movement is:",
+        options: [
+            "A) Lack of visibility",
+            "B) Vulnerability to enemy flanking",
+            "C) Inefficient use of resources",
+            "D) Slow response time"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 59,
+        question: "59. What is the goal of a night operation?",
+        options: [
+            "A) To catch the enemy off guard",
+            "B) To allow for better visibility",
+            "C) To avoid enemy detection with minimal noise",
+            "D) To avoid any combat"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 60,
+        question: "60. The primary benefit of a wedge formation is:",
+        options: [
+            "A) Maximum firepower in front",
+            "B) Better visibility for the lead unit",
+            "C) Enhanced defensive capabilities",
+            "D) Flexibility and quick response to threats"
+        ],
+        answer: 3,
+        selected: null
+    },
+    {
+        number: 61,
+        question: "61. During an assault, which of the following is the key to maintaining momentum?",
+        options: [
+            "A) Strict adherence to original plans",
+            "B) Frequent stops to reassess the situation",
+            "C) Continuous communication and flexibility in tactics",
+            "D) Relying solely on heavy artillery support"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 62,
+        question: "62. When engaging an enemy in an urban setting, soldiers should prioritize:",
+        options: [
+            "A) Large formations for firepower",
+            "B) Dispersed teams and close-quarter tactics",
+            "C) Using tanks for cover",
+            "D) Aerial strikes before ground forces"
+        ],
+        answer: 1,
+        selected: null
+    },
+  {
+        number: 63,
+        question: "63. The goal of a counterattack is to:",
+        options: [
+            "A) Hold a defensive line",
+            "B) Push the enemy back and regain lost ground",
+            "C) Provide reinforcements to the front line",
+            "D) Set up a defensive perimeter"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 64,
+        question: "64. Which HR strategy is designed to improve organizational performance?",
+        options: [
+            "A) Job specialization",
+            "B) Work-life balance programs",
+            "C) Employee training and development",
+            "D) Employee terminations"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 65,
+        question: "65. Which of the following is NOT one of the four primary functions of management?",
+        options: [
+            "A) Planning",
+            "B) Organizing",
+            "C) Motivating",
+            "D) Controlling"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 66,
+        question: "66. Which leadership style emphasizes decision-making based on group consensus?",
+        options: [
+            "A) Autocratic",
+            "B) Democratic",
+            "C) Laissez-faire",
+            "D) Charismatic"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 67,
+        question: "67. The foundation of personal leadership is:",
+        options: [
+            "A) Command authority",
+            "B) Self-awareness and personal discipline",
+            "C) Delegation of tasks",
+            "D) Performance incentives"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 68,
+        question: "68. Which of the following is essential for effective personal leadership?",
+        options: [
+            "A) Control over all decisions",
+            "B) Clear communication of goals",
+            "C) Frequent changes in strategy",
+            "D) Complete autonomy"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 69,
+        question: "69. Which of the following is an important trait of a transformational leader?",
+        options: [
+            "A) Focus on managing current operations",
+            "B) Motivation to inspire and develop followers",
+            "C) Strict control over decision-making",
+            "D) Independence from team feedback"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 70,
+        question: "70. Which leadership style is most suitable for combat operations?",
+        options: [
+            "A) Laissez-faire",
+            "B) Transformational",
+            "C) Autocratic",
+            "D) Delegative"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 71,
+        question: "71. A key component of military leadership is:",
+        options: [
+            "A) Fear-based control",
+            "B) Clear and decisive communication",
+            "C) Taking credit for others' work",
+            "D) Maintaining distance from the troops"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 72,
+        question: "72. What is the primary characteristic of military professionalism?",
+        options: [
+            "A) Discipline and respect for authority",
+            "B) Personal wealth",
+            "C) Independence from commands",
+            "D) Freedom to choose personal tasks"
+        ],
+        answer: 0,
+        selected: null
+    },
+    {
+        number: 73,
+        question: "73. The main responsibility of military leaders in terms of professionalism is to:",
+        options: [
+            "A) Ensure that personal interests are prioritized",
+            "B) Maintain discipline and lead by example",
+            "C) Only focus on training",
+            "D) Delegate all leadership tasks to subordinates"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 74,
+        question: "74. Combat support units are primarily responsible for:",
+        options: [
+            "A) Engaging in direct combat with the enemy",
+            "B) Providing logistical, medical, and fire support",
+            "C) Securing enemy territory",
+            "D) Training new recruits"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 75,
+        question: "75. Which of the following is a key role of combat support units in the battlefield?",
+        options: [
+            "A) Direct offensive action",
+            "B) Providing artillery and medical assistance",
+            "C) Designing battle strategies",
+            "D) Engaging in negotiations with the enemy"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 76,
+        question: "76. Which of the following is a primary method for secure military communication?",
+        options: [
+            "A) Radio transmissions",
+            "B) Written letters",
+            "C) Messengers on foot",
+            "D) Semaphore signals"
+        ],
+        answer: 0,
+        selected: null
+    },
+    {
+        number: 77,
+        question: "77. What is the role of communication in leadership?",
+        options: [
+            "A) To provide orders and guidance",
+            "B) To maintain secrecy",
+            "C) To increase the distance between leaders and troops",
+            "D) To make decisions independently of the team"
+        ],
+        answer: 0,
+        selected: null
+    },
+    {
+        number: 78,
+        question: "78. Which communication method is most effective during a combat operation?",
+        options: [
+            "A) Written reports",
+            "B) Non-verbal cues",
+            "C) Clear, concise radio communication",
+            "D) Group meetings in safe zones"
+        ],
+        answer: 2,
+        selected: null
+    },
+    {
+        number: 79,
+        question: "79. To ensure the effectiveness of a military message, it should be:",
+        options: [
+            "A) Complicated and detailed",
+            "B) Short, direct, and understood by all",
+            "C) Open to interpretation",
+            "D) Delivered at random intervals"
+        ],
+        answer: 1,
+        selected: null
+    },
+    {
+        number: 80,
+        question: "80. Which of the following is an example of military doctrine?",
+        options: [
+            "A) A detailed battle plan for a specific mission",
+            "B) A set of strategic principles applied in all military actions",
+            "C) Individual training manuals for soldiers",
+            "D) Daily schedules for officers"
+        ],
+        answer: 1,
+        selected: null
+    },
+  {
+    number: 81,
+    question: "81. Military doctrine emphasizes:",
+    options: [
+        "A) Flexibility and adaptability to changing situations",
+        "B) Rigid adherence to standard tactics without adjustment",
+        "C) Complete autonomy of military units",
+        "D) Minimal use of force in all situations"
+    ],
+    answer: 0,
+    selected: null
+},
+{
+    number: 82,
+    question: "82. In military pedagogy, the most effective way to ensure understanding is to:",
+    options: [
+        "A) Give theoretical lectures without practical exercises",
+        "B) Use repetition and drills to reinforce knowledge",
+        "C) Allow cadets to memorize key facts",
+        "D) Limit interaction and focus on individual learning"
+    ],
+    answer: 1,
+    selected: null
+},
+{
+    number: 83,
+    question: "83. Which of the following is a key component of experiential learning?",
+    options: [
+        "A) Observing without participating",
+        "B) Learning through direct experience and reflection",
+        "C) Relying solely on textbooks",
+        "D) Testing theoretical knowledge in a classroom"
+    ],
+    answer: 1,
+    selected: null
+},
+{
+    number: 84,
+    question: "84. Which teaching approach is most effective in developing leadership skills in military cadets?",
+    options: [
+        "A) Lectures on theory only",
+        "B) Case studies and situational exercises",
+        "C) Long written tests",
+        "D) Focusing only on physical fitness"
+    ],
+    answer: 1,
+    selected: null
+},
+{
+    number: 85,
+    question: "85. Which fitness component is most important for a soldier’s ability to carry heavy equipment over long distances?",
+    options: [
+        "A) Speed",
+        "B) Strength and endurance",
+        "C) Flexibility",
+        "D) Agility"
+    ],
+    answer: 1,
+    selected: null
+},
+{
+    number: 86,
+    question: "86. The study of military topography involves understanding:",
+    options: [
+        "A) The organization of military units",
+        "B) The physical features of the land and how they impact military operations",
+        "C) Military history",
+        "D) Military strategy"
+    ],
+    answer: 1,
+    selected: null
+},
+{
+    number: 87,
+    question: "87. Which of the following is a critical factor in military topography when planning an operation?",
+    options: [
+        "A) Terrain and visibility",
+        "B) The emotional state of soldiers",
+        "C) Uniform design",
+        "D) Number of soldiers available"
+    ],
+    answer: 0,
+    selected: null
+},
+{
+    number: 88,
+    question: "88. What is the primary tool used to understand terrain in military operations?",
+    options: [
+        "A) Radar",
+        "B) Topographic maps",
+        "C) Satellites",
+        "D) Visual observation"
+    ],
+    answer: 1,
+    selected: null
+},
+{
+    number: 89,
+    question: "89. The first step in conducting research is to:",
+    options: [
+        "A) Collect data",
+        "B) Formulate a research question",
+        "C) Analyze results",
+        "D) Present findings"
+    ],
+    answer: 1,
+    selected: null
+},
+{
+    number: 90,
+    question: "90. Which of the following is a primary research method in the social sciences?",
+    options: [
+        "A) Surveys and interviews",
+        "B) Physical fitness testing",
+        "C) Military drills",
+        "D) Combat simulations"
+    ],
+    answer: 0,
+    selected: null
+},
+    {
+        number: 8,
+        question: "91.What is the primary purpose of a research hypothesis?",
+        options: [
+            "A) To analyze data",
+            "B) To test an assumption or prediction",
+            "C) To present findings",
+            "D) To collect data"
+        ],
+        answer: 1, // B is at index 1
+        selected: null
+    },
+    {
+        number: 9,
+        question: "92.In research methodology, a literature review helps in:",
+        options: [
+            "A) Writing the conclusion",
+            "B) Identifying gaps in existing research",
+            "C) Designing surveys",
+            "D) Collecting data from participants"
+        ],
+        answer: 1, // B is at index 1
+        selected: null
+    },
+    {
+        number: 10,
+        question: "93.The primary objective of conflict management is to:",
+        options: [
+            "A) Win the argument",
+            "B) Resolve disputes and improve relationships",
+            "C) Avoid any conflict",
+            "D) Increase tension"
+        ],
+        answer: 1, // B is at index 1
+        selected: null
+    },
+    {
+        number: 11,
+        question: "94.Which of the following is an example of a collaborative conflict resolution strategy?",
+        options: [
+            "A) Withdrawal from the situation",
+            "B) Open discussion and finding a win-win solution",
+            "C) Forcing one party to accept the other’s view",
+            "D) Avoiding the issue entirely"
+        ],
+        answer: 1, // B is at index 1
+        selected: null
+    },
+    {
+        number: 12,
+        question: "95.Which of the following is a critical skill for a leader in managing conflict?",
+        options: [
+            "A) Aggression",
+            "B) Active listening",
+            "C) Ignoring the concerns of others",
+            "D) Avoiding confrontation"
+        ],
+        answer: 1, // B is at index 1
+        selected: null
+    },
+    {
+        number: 13,
+        question: "96.In conflict management, the goal should be to:",
+        options: [
+            "A) Avoid any form of conflict",
+            "B) Achieve a compromise that satisfies all parties",
+            "C) Win at all costs",
+            "D) Leave the situation unresolved"
+        ],
+        answer: 1, // B is at index 1
+        selected: null
+    },
+    {
+        number: 14,
+        question: "97.Military drill is primarily used to:",
+        options: [
+            "A) Improve physical fitness",
+            "B) Enhance the effectiveness of team coordination",
+            "C) Teach theoretical military concepts",
+            "D) Provide entertainment for soldiers"
+        ],
+        answer: 1, // B is at index 1
+        selected: null
+    },
+    {
+        number: 15,
+        question: "98.When executing a drill, soldiers should prioritize:",
+        options: [
+            "A) Completing the drill as quickly as possible",
+            "B) Precision, uniformity, and coordination",
+            "C) Personal style over uniformity",
+            "D) Avoiding physical strain"
+        ],
+        answer: 1, // B is at index 1
+        selected: null
+    },
+    {
+    number: 1,
+    question: "99.What is defined as a material that undergoes rapid, self-propagating decomposition to produce energy?",
+    options: [
+      "A) Fuel",
+      "B) Explosive",
+      "C) Metal",
+      "D) Chemical compound"
+    ],
+    answer: 1, // B is at index 1
+    selected: null
+  },
+  {
+    number: 2,
+    question: "100.Which of the following is NOT listed as a type of military explosive in the text?",
+    options: [
+      "A) TNT",
+      "B) C4",
+      "C) Dynamite",
+      "D) Nitroglycerin"
+    ],
+    answer: 3, // D is at index 3
+    selected: null
+  },
+];
+
+        let currentQuestionIndex = 0;
+        let timer;
+        let timeLeft = 60;
+        let studentName = ""; // Store the student's name
+
+        // Show the welcome page initially
+        document.getElementById("welcome-container").style.display = "block";
+
+        function startQuiz() {
+            const nameInput = document.getElementById("student-name");
+            if (!nameInput.value.trim()) {
+                alert("Please enter your full name!");
+                return;
+            }
+            studentName = nameInput.value.trim();
+
+            document.getElementById("welcome-container").style.display = "none";
+            document.getElementById("quiz-container").style.display = "block";
+            displayQuestion();
+            startTimer();
+        }
+
+        function displayQuestion() {
+            const questionData = questions[currentQuestionIndex];
+            document.getElementById("question-text").innerText = questionData.question;
+
+            const optionsContainer = document.getElementById("options");
+            optionsContainer.innerHTML = "";
+            questionData.options.forEach((option, index) => {
+                const label = document.createElement("label");
+                label.innerHTML = `<input type="radio" name="option" value="${index}" ${
+                    questionData.selected === index ? "checked" : ""
+                }> ${option}`;
+                optionsContainer.appendChild(label);
+            });
+
+            // Show/hide navigation buttons
+            document.getElementById("prev-btn").style.display =
+                currentQuestionIndex > 0 ? "inline-block" : "none";
+            document.getElementById("next-btn").style.display =
+                currentQuestionIndex < questions.length - 1 ? "inline-block" : "none";
+            document.getElementById("submit-btn").style.display =
+                currentQuestionIndex === questions.length - 1 ? "inline-block" : "none";
+        }
+
+        function startTimer() {
+            timeLeft = 60; // Reset timer
+            const timerElement = document.getElementById("timer");
+            timerElement.innerText = `Time left: ${timeLeft}s`;
+
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                timerElement.innerText = `Time left: ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    nextQuestion(); // Auto-move to the next question
+                }
+            }, 1000);
+        }
+
+        function prevQuestion() {
+            saveAnswer();
+            currentQuestionIndex--;
+            displayQuestion();
+            startTimer();
+        }
+
+        function nextQuestion() {
+            saveAnswer();
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion();
+                startTimer();
+            }
+        }
+
+        function saveAnswer() {
+            const selectedOption = document.querySelector('input[name="option"]:checked');
+            if (selectedOption) {
+                questions[currentQuestionIndex].selected = parseInt(selectedOption.value);
+            }
+        }
+
+        function showResults() {
+            saveAnswer();
+            clearInterval(timer);
+
+            const score = questions.reduce((acc, q) => (q.selected === q.answer ? acc + 1 : acc), 0);
+            const totalQuestions = questions.length;
+
+            document.getElementById("quiz-container").style.display = "none";
+            document.getElementById("result-container").style.display = "block";
+
+            document.getElementById("final-score").innerText = score;
+            document.getElementById("total-questions").innerText = totalQuestions;
+
+            const finalMessage = document.getElementById("final-message");
+            if (score >= totalQuestions / 2) {
+                finalMessage.innerText = `${studentName}, you passed the exam!`;
+                finalMessage.style.color = "green";
+            } else {
+                finalMessage.innerText = `${studentName}, you did not pass the exam.`;
+                finalMessage.style.color = "red";
+            }
+        }
+    </script>
+</body>
+</html>
